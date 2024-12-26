@@ -1,0 +1,684 @@
+const RC = false;
+const RB = false;
+
+const ambiance1audio = new Audio(RC ? 'https://static.pmdapp.fr/assets/sounds/mp05/trax/ambiance_rc.mp3' : "https://static.pmdapp.fr/assets/sounds/mp05/ambiance_bis.mp3");
+const ambiance2audio = new Audio(RC ? 'https://static.pmdapp.fr/assets/sounds/mp05/trax/ambiance_rc.mp3' : "https://static.pmdapp.fr/assets/sounds/mp05/ambiance_bis.mp3");
+const ambiance3audio = new Audio(RC ? 'https://static.pmdapp.fr/assets/sounds/mp05/trax/ambiance_rc.mp3' : "https://static.pmdapp.fr/assets/sounds/mp05/ambiance_bis.mp3");
+
+const uObstacle = 'https://static.pmdapp.fr/assets/orlyval/sounds/Obs_portes.mp3';
+
+const uAmbianceRA = "https://static.pmdapp.fr/assets/orlyval/sounds/ambiances/ambiance interieure.mp3";
+const uAmbianceRC = "https://static.pmdapp.fr/assets/sounds/mp05/trax/ambiance_rc.mp3";
+
+const start1audio = new Audio("https://static.pmdapp.fr/assets/orlyval/sounds/accels-deccels/0_20.mp3P");
+const acceleration1audio = new Audio("file:///C:/Users/Babamadi/Downloads/acceleration%20val.MP3");
+const slow1audio = new Audio("file:///C:/Users/Babamadi/Downloads/vitesse%20lente.MP3");
+const fast1audio = new Audio("file:///C:/Users/Babamadi/Downloads/vitesse%20rapide%20val.MP3");
+const freinage1audio = new Audio("file:///C:/Users/Babamadi/Downloads/freinage%20val.MP3");
+const arret1audio = new Audio( "file:///C:/Users/Babamadi/Downloads/val%20arret.MP3");
+const virage1audio = new Audio("https://static.pmdapp.fr/assets/orlyval/sounds/steady/30kmh steady.mp3P");
+const virage2audio = new Audio("https://static.pmdapp.fr/assets/orlyval/sounds/steady/20kmh steady.mp3P");
+const FuAudio = new Audio("https://static.pmdapp.fr/assets/orlyval/sounds/fu/fu 70kmh.mp3P")
+
+// const ronfleuraudio = new Audio("https://static.pmdapp.fr/assets/sounds/mp05/ronfleur.mp3");
+// const ronfleuraudio = new Audio(RC ? 'https://static.pmdapp.fr/assets/sounds/mp05/mrsy/ronfleur.mp3' : "https://static.pmdapp.fr/assets/sounds/MP89/ronfleur3.mp3");
+const ronfleuraudio = new Audio("https://static.pmdapp.fr/assets/orlyval/sounds/portes/ronfleur.mp3");
+ronfleuraudio.volume = 0.6;
+// const tbreakaudio = new Audio("https://static.pmdapp.fr/assets/orlyval/sounds/fu/de-fu.mp3");
+const audioMindTheGap = new Audio("https://static.pmdapp.fr/assets/sounds/mp05/gap_.mp3");
+audioMindTheGap.volume = 0.8;
+audioMindTheGap.addEventListener("ended", () => {
+    SOUND_MANAGER.playSound("pt3");
+});
+
+const uCompresseurStart = "https://static.pmdapp.fr/assets/sounds/mp05/compresseurStart2.mp3";
+const uCompresseurStop = "https://static.pmdapp.fr/assets/sounds/mp05/compresseurStop2.mp3";
+const uCompresseurLoop = "https://static.pmdapp.fr/assets/sounds/mp05/compresseurLoop2.mp3";
+
+// const audioTerminus = new Audio("https://static.pmdapp.fr/assets/sounds/mp05_terminus_garage.mp3");
+const audioTerminus = new Audio("https://static.pmdapp.fr/assets/sounds/ligne1/ng/TERMINUS.mp3");
+
+const materialName = "OrlyVAL";
+/*
+const audioDoorLoop = new Audio(RC ? 'https://static.pmdapp.fr/assets/sounds/mp05/mrsy/doorSlide.mp3' : 'https://static.pmdapp.fr/assets/sounds/mp05/doorMove.mp3');
+const audioDoorUnlock = new Audio(RC ? 'https://static.pmdapp.fr/assets/sounds/mp05/mrsy/doorUnlock.mp3' : 'https://static.pmdapp.fr/assets/sounds/mp05/doorOpen.mp3');*/
+// const audioDoorLoop = new Audio("https://static.pmdapp.fr/assets/orlyval/sounds/portes/ouverture portes.mp3");
+const audioDoorClose = new Audio("https://static.pmdapp.fr/assets/orlyval/sounds/portes/verouilleur.mp3");
+const audioDoorUnlock = new Audio("https://static.pmdapp.fr/assets/orlyval/sounds/portes/ouverture_portes.mp3");
+// const audioDoorClose = new Audio( 'https://static.pmdapp.fr/assets/sounds/mp05/trax/doorLock.mp3');
+
+const rythmaudios = [
+    start1audio, // 1 - Starting
+    acceleration1audio, // 2 - Acceleration
+    slow1audio, // 3 - Slow passive
+    fast1audio, // 4 - Fast Passive
+    freinage1audio, // 5 - Braking
+    arret1audio, // 6 - Complete stop
+    virage1audio, virage2audio, // 7 - Any Speed in curve
+    FuAudio]; // 8 - FU
+
+const startAudios = [start1audio];
+const accelerationAudios = [acceleration1audio];
+const slowAudios = [slow1audio];
+const fastAudios = [fast1audio];
+const freinageAudios = [freinage1audio];
+const arretAudios = [arret1audio];
+const virageAudios = [virage1audio, virage2audio];
+const ronfleurFrequencies = [
+    new Frequency(345, "square", 3),
+    new Frequency(350, "square", 30),
+    new Frequency(330, "square", 3),
+    new Frequency(340, "sine", 15),
+    new Frequency(1034, "square", 3),
+    new Frequency(1378, "square", 1)
+];
+
+/*const NBG = {
+    version: NBG_VERSION_3_0_0,
+    stockUrl: ("https://static.pmdapp.fr/assets/rameMP05.png"),
+    doors: {
+        mode: 1,
+        count: 3,
+        bottomOffset: 33,
+        height: 108,
+        width: 48,
+        textures: {
+            left: "https://static.pmdapp.fr/assets/porte1MP05.png",
+            right: "https://static.pmdapp.fr/assets/porte2MP05.png"
+        }
+    }
+}*/
+const NBG = {
+    version: NBG_VERSION_3_0_1,
+    mode: 'scale',
+    doors: {
+        mode: 1,
+        count: 3,
+        bottomOffset: 33,
+        height: 108,
+        width: 48,
+        positions: [74, 286, 497]
+    },
+    livery: livree,
+    livery_default: {
+        door_0_left: 'https://static.pmdapp.fr/assets/orlyval/img/P6.png',
+        door_0_right: 'https://static.pmdapp.fr/assets/orlyval/img/P5.png',
+        door_1_left: "https://static.pmdapp.fr/assets/orlyval/img/P4.png",
+        door_1_right: "https://static.pmdapp.fr/assets/orlyval/img/P3.png",
+        door_2_left: "https://static.pmdapp.fr/assets/orlyval/img/P2.png",
+        door_2_right: "https://static.pmdapp.fr/assets/orlyval/img/P1.png",
+        layer1: "https://static.pmdapp.fr/assets/orlyval/img/orlyval nodoors.png",
+        layer0: "https://static.pmdapp.fr/assets/orlyval/img/INTERIOR_ON.png",
+    }
+}
+
+const globalSpeedLimit = 80; // Speed limit of the material
+const doorWidth = 43; // Door width of the material
+const absoluteDoor = true; // Whenever the train is forbidden or not to travel with opened doors
+const supportsAnnouncements = true;
+
+let compresseurRunning = false;
+
+function toggleCompresseur() {
+    if (compresseurRunning) {
+        // audioCompresseurLoop.stop();
+        SOUND_MANAGER.playSound("compresseurStop");
+        SOUND_MANAGER.stopSound("compresseurLoop");
+        // audioCompresseurStop.play();
+        compresseurRunning = false;
+
+    } else {
+        // audioCompresseurStart.play();
+        SOUND_MANAGER.playSound("compresseurStart", 1, 1, ()=>{
+            compresseurPlay();
+        });
+        compresseurRunning = true;
+    }
+}
+function compresseurPlay(){
+    SOUND_MANAGER.playSound("compresseurLoop", 1, 1, ()=>{
+        compresseurPlay();
+    });
+}
+
+function doorStart(dir = 2){
+
+    if(doorState === 0){
+        if(dir === 2){
+            SOUND_MANAGER.playSound("doorOpen");
+        }else if(dir === 1){
+            SOUND_MANAGER.playSound("doorClose");
+        }
+    }
+    doorState = dir;
+}
+function doorStop(){
+    doorState = 0;
+    SOUND_MANAGER.stopSound("doorClose");
+    SOUND_MANAGER.stopSound("doorOpen");
+}
+
+let GENE = false;
+
+function doorOpen() {
+    return;
+    if (audDoorClosePlaying) {
+        audioDoorClose.stop();
+        audDoorClosePlaying = false;
+    }
+    if (currentSpeed > 0) {
+        oerror();
+        return;
+    }
+
+    if (areDoorFullyOpened()) return;
+
+    if (doorTimeout) {
+        clearTimeout(doorTimeout);
+        doorTimeout = false;
+    }
+    let wg = GENE;
+    GENE = false;
+    if (document.getElementById("mDoorFail")) document.getElementById("mDoorFail").classList.remove("lit");
+    if (doorState === 2) return; // Already opening
+    if (doorState === 1) {
+        doorStop();
+        return;
+    }
+    if(wg){
+        SOUND_MANAGER.playSound('doorUnlock');
+    }
+    if (!doorStatus && !wg) {
+        // Door was locked
+        // audioDoorUnlock.play();
+        SOUND_MANAGER.playSound('doorUnlock');
+        // console.log("BAHAHA")
+        setTimeout(function () {
+            if (doorState === 0) {
+                doorStatus = true;
+                if (document.querySelector("#mDoorLock")) document.querySelector("#mDoorLock").classList.remove("lit");
+                doorStart(2);
+            }
+        }, 250);
+    } else {
+        if (doorState === 0) {
+
+            doorStatus = true;
+            if (document.querySelector("#mDoorLock")) document.querySelector("#mDoorLock").classList.remove("lit");
+            doorStart(2);
+        }
+    }
+
+}
+
+let freqin = 3;
+
+function closeDoor() {
+    return;
+    if (GENE) return; // Nope, reopen first
+    if (areDoorFullyClosed()) {
+        new Audio("https://static.pmdapp.fr/assets/sounds/ding2.mp3").play();
+    }
+    if (!doorStatus) return; // Doors are already closed
+    if (doorRonfleur) {
+        // _closeDoor();
+        return;
+    }
+    if (!doorOpened) return;
+
+    doorRonfleur = true;
+
+    let ronfleur = document.getElementsByClassName("ronfleur");
+    for (let i = 0; i < ronfleur.length; i++) {
+        let elem = ronfleur[i];
+        elem.style.backgroundColor = "red";
+    }
+
+    ronfleuraudio.play();
+}
+
+function _closeDoor() {
+    return;
+    if (GENE) return; // Nope, reopen first
+    if (!doorStatus && !areDoorMoving()) return; // Doors *are* closed
+    if (doorOpened && !doorRonfleur) return;
+    doorRonfleur = false;
+    doorOpened = false;
+
+    let ronfleur = document.getElementsByClassName("ronfleur");
+    for (let i = 0; i < ronfleur.length; i++) {
+        let elem = ronfleur[i];
+        elem.style.backgroundColor = "transparent";
+    }
+
+    ronfleuraudio.pause();
+    ronfleuraudio.currentTime = 0;
+    // stopFrequencies();
+    // stopRonfleur();
+
+    if (doorState === 1) return; // Already closing
+    if (doorState === 2) {
+        doorStop();
+        return;
+    }
+    if (doorState === 0) {
+
+        SOUND_MANAGER.playSound('doorClose');
+        doorStart(1);
+    }
+}
+
+let newAudio = true;
+
+function onStockLoaded() {
+    SOUND_MANAGER.registerSound("pt1", upt1);
+    SOUND_MANAGER.registerSound("pt2", upt2);
+    SOUND_MANAGER.registerSound("pt3", upt3)
+
+    SOUND_MANAGER.registerSound("verr", "https://static.pmdapp.fr/assets/orlyval/sounds/portes/verouilleur.mp3");
+    NADOMAS.lock_delay_min = 0;
+
+    SOUND_MANAGER.registerSound("ambiance", uAmbianceRA);
+    SOUND_MANAGER.registerSound("vibreur", "https://static.pmdapp.fr/assets/orlyval/sounds/portes/ronfleur.mp3");
+    SOUND_MANAGER.registerSound("doorObstacle", uObstacle);
+    SOUND_MANAGER.registerSound("doorOpen", "https://static.pmdapp.fr/assets/orlyval/sounds/portes/ouverture portes.mp3", 2);
+    SOUND_MANAGER.registerSound("doorClose", "https://static.pmdapp.fr/assets/orlyval/sounds/portes/doorclose2.mp3", 2);
+    // SOUND_MANAGER.registerSound('doorMove', RC ? 'https://static.pmdapp.fr/assets/sounds/mp05/doorMove_.mp3' : 'https://static.pmdapp.fr/assets/sounds/mp05/int/doorMove.mp3');
+    AMBIANCE_AUDIOS.push("ambiance");
+
+
+    ronfleuraudio.loop = true;
+    ronfleuraudio.onended = function () {
+    }
+    audioDoorClose.onended = function () {
+        audioDoorClose.pause();
+        audioDoorClose.currentTime = 0;
+    }
+    audioDoorUnlock.onended = function () {
+        audioDoorUnlock.pause();
+        audioDoorUnlock.currentTime = 0;
+    }
+
+    keyF = function () {
+    }
+
+    stationAnnouncement = function () {
+        zoneStations.forEach(station => {
+            if (-globalTranslate > station.start && -globalTranslate < station.end) { // Currently in a station.
+                firstAnnouncement = false;
+                secondAnnouncement = false;
+                gapAnnouncement = false;
+                pt1 = false;
+                pt2 = false;
+                pt3 = false;
+                return;
+            }
+            if(station.closed) return;
+            if (!station.annonce1 && !station.annonce2 && !station.gap) return; // No announcement
+            if (station.annonce1 && -globalTranslate > (station.start - 5000) && -globalTranslate < station.start) {
+                if (!firstAnnouncement) {
+                    firstAnnouncement = true;
+
+                    SOUND_MANAGER.playSound("pt1", 1, 1, () => {
+                        SOUND_MANAGER.playSound(station.annonce1,1,1,()=>{
+                            setTimeout(()=>{
+                                SOUND_MANAGER.playSound("pt2");
+                            }, 750);
+                        });
+                    });
+                }
+            }
+            if (metrolinep !== "tram/1002") {
+                if (-globalTranslate > (station.start - 500) && -globalTranslate < station.start) {
+                    if (!secondAnnouncement) {
+                        secondAnnouncement = true;
+                        if (station.annonce2) {
+                            setTimeout(()=>{
+                                SOUND_MANAGER.playSound(station.annonce2, 1, 1, ()=>{
+                                    if(station.gap){
+                                        setTimeout(()=>{
+                                            audioMindTheGap.play();
+                                            audioMindTheGap.onended = ()=>{
+                                                SOUND_MANAGER.playSound("pt3");
+                                            }
+                                        }, 750);
+                                    }else{
+                                        setTimeout(()=>{
+                                            SOUND_MANAGER.playSound("pt3");
+                                        }, 750);
+                                    }
+                                });
+                            }, 1);
+                        } else if (station.gap) {
+                            audioMindTheGap.play();
+                        }
+                    }
+                }
+            }
+
+        });
+
+        //! ICI
+        
+    }
+
+    if(realistic) require('materiel/89series.js');
+}
+
+function oerror(i = 0) {
+}
+
+
+function __closeDoor() {
+    return;
+    if (doorRonfleur) _closeDoor();
+}
+
+let doorTimeout = false;
+
+
+let FORCE_AAA = false;
+function onDoorClose() {
+    doorStop();
+    SOUND_MANAGER.playSound("verr");
+    return;
+
+
+    let delay = (Math.random() * 50) > 45;
+    let fail = (Math.random() * 100) > 95 || FORCE_AAA;
+    if (param_no_door_problem) fail = false;
+    if (param_no_door_problem) delay = false;
+
+    if (fail) {
+        doorTimeout = setTimeout(function () {
+            SOUND_MANAGER.playSound('doorObstacle');
+            if (doorTimeout) {
+                document.getElementById("mDoorFail").classList.add("lit");
+                clearTimeout(doorTimeout);
+                doorTimeout = false;
+                GENE_PBLC = true;
+            }
+        }, 3000);
+        GENE = true;
+    } else doorTimeout = setTimeout(function () {
+        if (doorTimeout) {
+            doorStatus = false;
+            if (document.querySelector("#mDoorLock")) document.querySelector("#mDoorLock").classList.add("lit");
+            oerror(2);
+
+            if (!audDoorClosePlaying) {
+                audioDoorClose.play();
+                audDoorClosePlaying = true;
+            }
+            doorTimeout = false;
+        }
+    }, delay ? 1000 : 350);
+}
+
+function customRender() {
+}
+
+let audDoorClosePlaying = false;
+
+function customTick(delta) {
+    if (doorState === 1) {
+        if (doorProgress < 3) {
+            doorProgress -= 0.1 * delta;
+        } else if (doorProgress < 5) {
+            doorProgress -= 0.3 * delta;
+        } else {
+            doorProgress -= 0.6 * delta;
+        }
+    }
+    if (doorState === 2) {
+        // doorProgress += 0.5 * delta;
+
+        if (doorProgress > (doorWidth - 3)) {
+            doorProgress += 0.24 * delta;
+        } else if (doorProgress > (doorWidth - 5)) {
+            doorProgress += 0.16 * delta;
+        } else {
+            doorProgress += 0.6 * delta;
+        }
+    }
+    if (doorProgress <= 0 && doorState !== 0) {
+        doorProgress = 0;
+        onDoorClose();
+    }
+    if (doorProgress >= doorWidth && doorState !== 0) {
+        doorProgress = doorWidth;
+        onDoorOpened();
+        audioDoorMoveEnd.currentTime = 0;
+        audioDoorMoveEnd.play();
+    }
+}
+
+const allowAva = false;
+
+
+function loadStock() {
+
+    ronfleuraudio.loop = true;
+    ronfleuraudio.onended = function () {
+    }
+    audioDoorClose.onended = function () {
+        audioDoorClose.pause();
+        audioDoorClose.currentTime = 0;
+    }
+    audioDoorUnlock.onended = function () {
+        audioDoorUnlock.pause();
+        audioDoorUnlock.currentTime = 0;
+    }
+
+    keyF = function () {
+    }
+
+}
+
+const upt1 = "https://static.pmdapp.fr/assets/sounds/mp05/pt1_.mp3";
+const upt2 = "https://static.pmdapp.fr/assets/sounds/mp05/pt2_.mp3";
+const upt3 = "https://static.pmdapp.fr/assets/sounds/mp05/pt3_.mp3";
+let pt1 = false;
+let pt2 = false;
+let pt3 = false;
+
+function NBG_DrawRonfleur(ctx,x,y){
+    ctx.fillStyle = doorRonfleur ? 'rgba(199,37,30,0.98)' : 'rgba(172,24,18,0.31)';
+    ctx.drawHalfBottomCircle(x, y+6, 3);
+    ctx.fill();
+}
+
+Game.addEventListener(Events.DOMLoaded, ()=>{
+    document.getElementById('speedslider').max='10'
+    document.getElementById('speedslider').min='-10'
+
+    SOUND_MANAGER.loopSoundBis=function(id, vol = 1, pitch = 1, prespitch = false){
+        if(SOUND_MANAGER.getPlayingSounds(id) && SOUND_MANAGER.getPlayingSounds(id).length >= 1) {
+            for(let sound of SOUND_MANAGER.getPlayingSounds(id)){
+                sound.gainNode.gain.value = vol;
+                SOUND_MANAGER.setPitch(id, sound, pitch, prespitch);
+            }
+            return;
+        }
+        let b = ()=>{
+            SOUND_MANAGER.playSound(id,vol,pitch,b);
+        }
+        b();
+    }
+
+    SOUND_MANAGER.setPitch = (name, source, value, preserve=false) =>{
+        if((value <0 && !SOUND_MANAGER.soundsdelta[name]) || (value >=0 && !!SOUND_MANAGER.soundsdelta[name])){
+            let a = source.buffer;
+            Array.prototype.reverse.call( a.getChannelData(0) );
+            if(value < 0){
+                SOUND_MANAGER.soundsdelta[name]=true;
+            }else{
+                SOUND_MANAGER.soundsdelta[name]=false;
+            }
+        }
+        source.preservesPitch = true;
+        // source.detune = 800;
+        source.playbackRate.value = Math.abs(value);
+    }
+
+    SOUND_MANAGER.soundsdelta= {}
+
+    const maxThrottle = 5
+    let delta = 1;
+    let lastUpdate = Date.now();
+    let max_tps = 50.0;
+    const maxSpeed = 80;
+
+    let fu = false
+
+    let fuTriggered = false
+
+    let fuAcq = false
+    let finFu = false
+
+
+
+    function up(){
+        update();
+        requestAnimationFrame(up);
+
+    }
+
+    function update(){
+        let currentThrottleBis=currentThrottle*5/10
+        let rn = Date.now();
+        let inter = rn - lastUpdate;
+        let theorical_inter = 1000.0 / max_tps;
+        delta = inter / theorical_inter;
+        lastUpdate = rn;
+        if(delta>5)delta=5;
+        if(delta<=0)return;
+
+        let throttlePourcent = (currentThrottleBis*100)/maxThrottle
+
+        let vitessePourcent = (currentSpeed*100)/maxSpeed
+        let aigFreqThreshold = 24 //valeur de viteesse où la fréquence aigue commence à disparaitre
+        let aigFreqVol = 0.5
+        let bFreqVol = 0.1
+
+        bFreqVol=0.5-aigFreqVol+0.1
+
+        if(fuTriggered===false){
+            if(currentSpeed>aigFreqThreshold){
+                if(currentSpeed>24) aigFreqVol=0.5
+                if(currentSpeed>26) aigFreqVol=0.4
+                if(currentSpeed>30) aigFreqVol=0.3
+                if(currentSpeed>36) aigFreqVol=0.2
+                if(currentSpeed>38) aigFreqVol=0.1
+                if(currentSpeed>40) aigFreqVol=0
+            }
+
+
+            if(currentSpeed>0 && currentThrottleBis!=0){
+                SOUND_MANAGER.loopSoundBis('hach206',Math.abs(throttlePourcent)/70)
+                SOUND_MANAGER.loopSoundBis('hach206all',Math.abs(throttlePourcent)/180+0.15)
+                //SOUND_MANAGER.loopSoundBis('hach206ng',0.3)
+                //SOUND_MANAGER.loopSoundBis('hach206bis',0.1)
+                isPlayingHach=true
+            } else {
+                SOUND_MANAGER.stopSound('hach206')
+                SOUND_MANAGER.stopSound('hach206bis')
+                SOUND_MANAGER.stopSound('hach206ng')
+                SOUND_MANAGER.stopSound('hach206all')
+            }
+            if (currentSpeed===0 || currentThrottleBis===0){
+                //SOUND_MANAGER.stopSound('hach206')
+            }
+
+            if(currentSpeed>0){
+                //SOUND_MANAGER.loopSoundBis('mot206',0.5,currentSpeed/20)
+                SOUND_MANAGER.loopSoundBis('mot2061F',Math.min(20/currentSpeed,0.5),currentSpeed/20)
+                //console.log(`${Math.min(20/currentSpeed,0.5)}`)
+                SOUND_MANAGER.loopSoundBis('mot2062F',aigFreqVol,currentSpeed/20)
+                SOUND_MANAGER.loopSoundBis('mot2063F',bFreqVol,currentSpeed/20)
+            }
+        } else {
+            if(currentSpeed===0) fuTriggered=false;
+
+            fuAcq=true
+            if(fu===false){
+                SOUND_MANAGER.playSound('fuprem206')
+                fu=true
+            }
+            //rangeInput.value=-5
+            //currentSpeed += ((-7.5 / 60) * delta);
+
+            //SOUND_MANAGER.stopSound('mot2062F')
+            SOUND_MANAGER.stopSound('mot2063F')
+            SOUND_MANAGER.stopSound('hach206')
+            SOUND_MANAGER.stopSound('hach206ng')
+            SOUND_MANAGER.stopSound('hach206all')
+
+
+            SOUND_MANAGER.loopSoundBis('mot2061F',0.5,currentSpeed/20)
+            SOUND_MANAGER.loopSoundBis('mot2062F',0.2,currentSpeed/20)
+
+            if(currentSpeed<12 && finFu===false){
+                finFu=true
+                SOUND_MANAGER.playSound('finfu206',1.5)
+            }
+
+
+            //SOUND_MANAGER.loopSoundBis('mot2063F',bFreqVol,currentSpeed/20)
+        }
+
+        if(currentSpeed>0 && fu===true && fuTriggered===false){
+            fu=false
+            fuAcq=false
+            finFu=false
+            SOUND_MANAGER.playSound('defu206')
+            //SOUND_MANAGER.stopSound('ambiance206')
+            //SOUND_MANAGER.stopSound('finHach206')
+        } else if (currentSpeed===0 && fu===false && fuAcq===false){
+            fu=true
+            SOUND_MANAGER.playSound('fu206')
+            SOUND_MANAGER.loopSoundBis('ambiance206')
+            SOUND_MANAGER.stopSound('finfu206')
+        }
+
+        if(currentSpeed>0){
+            SOUND_MANAGER.loopSoundBis('ambBase206',currentSpeed/60,Math.max((currentSpeed/60)-0.3,0.1))
+            //console.log(`${Math.max((currentSpeed/60)-0.3,0.1)}`)
+        }
+    }
+
+
+    let fuTrigger = document.getElementById('emergencyStop')
+    fuTrigger.addEventListener('click',()=>{
+        fuTriggered=true
+    });
+
+
+
+
+
+
+
+    (()=>{
+        requestAnimationFrame(up);
+        //SOUND_MANAGER.registerSound('hach206','https://static.pmdapp.fr/assets/sounds/val206/hacheur1.mp3')
+        SOUND_MANAGER.registerSound('hach206bis','https://static.pmdapp.fr/assets/sounds/val206/hacheur1.mp3')
+        SOUND_MANAGER.registerSound('hach206','https://static.pmdapp.fr/assets/sounds/val206/hacheureel.mp3')
+        SOUND_MANAGER.registerSound('hach206all','https://static.pmdapp.fr/assets/sounds/val206/hachAig2.mp3')
+        SOUND_MANAGER.registerSound('hach206base','https://static.pmdapp.fr/assets/sounds/val206/hacheur_base.mp3')
+        SOUND_MANAGER.registerSound('hach206ng','https://static.pmdapp.fr/assets/sounds/val206/hacheurng.mp3')
+        SOUND_MANAGER.registerSound('ambiance206','https://static.pmdapp.fr/assets/sounds/val206/ambianceinter.mp3')
+        SOUND_MANAGER.registerSound('ambBase206','https://static.pmdapp.fr/assets/sounds/val206/ambAvecBase.mp3')
+        SOUND_MANAGER.registerSound('ambSansBase206','https://static.pmdapp.fr/assets/sounds/val206/ambSansBase.mp3')
+        SOUND_MANAGER.registerSound('finHach206','https://static.pmdapp.fr/assets/sounds/val206/finHach.mp3')
+        SOUND_MANAGER.registerSound('mot206','https://static.pmdapp.fr/assets/sounds/val206/mot.mp3')
+        SOUND_MANAGER.registerSound('mot2061F','https://static.pmdapp.fr/assets/sounds/val206/mot1F.mp3')
+        SOUND_MANAGER.registerSound('mot2062F','https://static.pmdapp.fr/assets/sounds/val206/mot2F.mp3')
+        SOUND_MANAGER.registerSound('mot2063F','https://static.pmdapp.fr/assets/sounds/val206/mot3F.mp3')
+
+        SOUND_MANAGER.registerSound('fu206','https://static.pmdapp.fr/assets/sounds/val206/fu-propre.mp3')
+        SOUND_MANAGER.registerSound('defu206','https://static.pmdapp.fr/assets/sounds/val206/de-fu.mp3')
+        SOUND_MANAGER.registerSound('fuprem206','https://static.pmdapp.fr/assets/sounds/val206/fu_prem.mp3')
+        SOUND_MANAGER.registerSound('finfu206','https://static.pmdapp.fr/assets/sounds/val206/finFu.mp3')
+    })();
+});
